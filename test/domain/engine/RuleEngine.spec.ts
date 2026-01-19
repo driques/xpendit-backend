@@ -6,13 +6,25 @@ import {
 } from '../../../src/domain/rules';
 import { ExpenseStatus, Employee } from '../../../src/domain/models';
 import { buildContext } from '../helpers/buildContext';
+import { Clock } from '../../../src/domain/ports/Clock';
+import { FakeClock } from '../../helpers/FakeClock';
 
 describe('RuleEngine', () => {
-  const engine = new RuleEngine([
-    new CostCenterCategoryRule(),
-    new ExpenseAgeRule(),
-    new CategoryLimitRule(),
-  ]);
+  let clock: Clock;
+  let engine: RuleEngine;
+
+  beforeEach(() => {
+    clock = new FakeClock(
+      new Date('2025-01-10'),
+    );
+
+    engine = new RuleEngine([
+      new CostCenterCategoryRule(),
+      new ExpenseAgeRule(clock),
+      new CategoryLimitRule(),
+    ]);
+  });
+
 
   it('REJECTED has priority over PENDING and APPROVED', () => {
     const employee = new Employee('e-1', 'Ana', 'Dev', 'core_engineering');

@@ -2,13 +2,24 @@ import { Rule } from './Rule';
 import { RuleContext } from './RuleContext';
 import { RuleResult } from './RuleResult';
 import { ExpenseStatus, Alert } from '../models';
+import { Clock } from '../ports/Clock';
 
 export class ExpenseAgeRule implements Rule {
-  evaluate(context: RuleContext): RuleResult {
-    const { expenseAgeInDays, policy } = context;
+  constructor(private readonly clock: Clock) {}
+
+  evaluate(context: RuleContext): RuleResult | null {
+    const { expense, policy } = context;
     const { pendingDays, rejectedDays } = policy.ageLimit;
 
-    if (expenseAgeInDays > rejectedDays) {
+    const now = this.clock.now();
+    const expenseDate = new Date(expense.date);
+
+    const ageInDays = Math.floor(
+      (now.getTime() - expenseDate.getTime()) /
+      (1000 * 60 * 60 * 24),
+    );
+
+    if (ageInDays > rejectedDays) {
       return new RuleResult(ExpenseStatus.REJECTED, [
         new Alert(
           'LIMITE_ANTIGUEDAD',
@@ -17,7 +28,7 @@ export class ExpenseAgeRule implements Rule {
       ]);
     }
 
-    if (expenseAgeInDays > pendingDays) {
+    if (ageInDays > pendingDays) {
       return new RuleResult(ExpenseStatus.PENDING, [
         new Alert(
           'LIMITE_ANTIGUEDAD',

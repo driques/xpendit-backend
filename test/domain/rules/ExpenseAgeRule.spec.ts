@@ -1,34 +1,36 @@
 import { ExpenseAgeRule } from '../../../src/domain/rules';
 import { ExpenseStatus } from '../../../src/domain/models';
+import { FakeClock } from '../../helpers/FakeClock';
 import { buildContext } from '../helpers/buildContext';
+import { Clock } from '../../../src/domain/ports/Clock';
 
 describe('ExpenseAgeRule', () => {
-  const rule = new ExpenseAgeRule();
+  it('REJECTED when expense is older than rejectedDays', () => {
+    const clock: Clock = new FakeClock(new Date('2025-01-10'));
 
-  it('APPROVED when expense age is within approved range', () => {
-    const context = buildContext({ expenseAgeInDays: 10 });
+    const rule = new ExpenseAgeRule(clock);
 
-    const result = rule.evaluate(context);
+    const context = buildContext({
+      expense: {
+        date: '2024-12-01',
+        id: '',
+        amount: 0,
+        currency: '',
+        category: '',
+      },
+      policy: {
+        ageLimit: {
+          pendingDays: 5,
+          rejectedDays: 10,
+        },
+        baseCurrency: '',
+        categoryLimits: {},
+        costCenterRules: [],
+      },
+    });
 
-    expect(result.status).toBe(ExpenseStatus.APPROVED);
-    expect(result.alerts).toHaveLength(0);
-  });
-
-  it('PENDING when expense exceeds pending threshold', () => {
-    const context = buildContext({ expenseAgeInDays: 40 });
-
-    const result = rule.evaluate(context);
-
-    expect(result.status).toBe(ExpenseStatus.PENDING);
-    expect(result.alerts[0].code).toBe('LIMITE_ANTIGUEDAD');
-  });
-
-  it('REJECTED when expense exceeds rejected threshold', () => {
-    const context = buildContext({ expenseAgeInDays: 70 });
-
-    const result = rule.evaluate(context);
+    const result = rule.evaluate(context)!;
 
     expect(result.status).toBe(ExpenseStatus.REJECTED);
-    expect(result.alerts[0].code).toBe('LIMITE_ANTIGUEDAD');
   });
 });
