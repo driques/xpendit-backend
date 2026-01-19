@@ -1,98 +1,103 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvdXBsb2FkZWQvaW1nXzM0a2R0Y3NKVEgyY2JhNGh1U1REZThKZnFySiJ9?width=200" width="120" alt="Xpendit Logo" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Xpendit Backend Challenge
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Este repositorio contiene la solución al **Desafío Técnico de Xpendit**.  
+Corresponde a una aplicación backend construida con **NestJS** y **TypeScript**, cuyo objetivo es **procesar, validar y clasificar gastos corporativos** a partir de distintas reglas de negocio.
 
-## Description
+La solución pone énfasis en **diseño limpio, testabilidad y separación de responsabilidades**, más que en el framework en sí.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Arquitectura y Diseño
+
+El diseño está fuertemente inspirado en **Clean Architecture** y **Domain-Driven Design (DDD)**.
+
+### Principios Clave
+
+- **Dominio Rico**  
+  La lógica de negocio reside exclusivamente en la capa **Domain**, encapsulada en entidades, reglas y un motor de evaluación.  
+  El dominio no depende de frameworks, I/O ni detalles de infraestructura.
+
+- **Arquitectura Hexagonal (Puertos y Adaptadores)**  
+  - El núcleo de la aplicación define **puertos** (interfaces) para interactuar con servicios externos.
+  - Las integraciones (API de tipo de cambio, lectura de CSV, HTTP) se implementan como **adaptadores** en la capa de infraestructura.
+
+- **Separación de Responsabilidades**
+  - **Domain**: reglas de negocio puras y motor de evaluación.
+  - **Application**: orquestación, casos de uso y procesamiento batch.
+  - **Infra / API**: detalles técnicos (clientes HTTP, parsers CSV, controllers REST).
+
+---
+
+## Estrategia de Ramas (Contexto del Desafío)
+
+El desarrollo se organizó en **ramas incrementales**, cada una correspondiente a una parte específica del desafío técnico:
+
+1. **Part 1 – Dominio y Motor de Reglas**  
+   - Implementación del `RuleEngine` y reglas de negocio.
+   - Precedencia clara de estados: `REJECTED > PENDING > APPROVED`.
+   - Tests unitarios del dominio.
+
+2. **Part 2 – Integración con Exchange Rates**  
+   - Integración real con la API de **Open Exchange Rates**.
+   - Uso de un puerto (`ExchangeRateProvider`) para desacoplar la infraestructura.
+   - Configuración mediante variables de entorno.
+
+3. **Part 3 – Procesamiento Batch y CSV**  
+   - Lectura y parseo de archivos CSV.
+   - Enriquecimiento del contexto de evaluación.
+   - Ejecución batch del motor de reglas.
+   - Ejemplo funcional de ejecución (`main.ts`).
+
+4. **Part 4 – API REST (Opcional / Extra)**  
+   > Esta parte **no fue solicitada explícitamente en la prueba**.
+   >
+   > Se implementó como una extensión voluntaria para demostrar la flexibilidad de la arquitectura.
+
+   - Exposición de un endpoint `POST` para subir archivos CSV.
+   - Reutilización completa del dominio y la lógica batch.
+   - Respuesta estructurada lista para ser consumida por un frontend.
+   - Cliente frontend de demostración disponible en:  
+      https://github.com/driques/xpendit-front/tree/master
+
+---
+
+## Manejo del Tiempo y Testabilidad
+
+El cálculo de antigüedad de los gastos se realiza a través de un **puerto `Clock`**, evitando dependencias directas con el tiempo del sistema.
+
+- `SystemClock`: implementación real (infraestructura).
+- `FakeClock`: implementación usada en tests para lograr resultados deterministas.
+
+Este enfoque permite tests confiables y reproducibles.
+
+---
+
+## Setup y Ejecución
+
+### Prerrequisitos
+
+Configurar las variables de entorno necesarias (puede usarse `.env.example` como referencia).
 
 ```bash
-$ npm install
+# Instalar dependencias
+npm install
 ```
-
-## Compile and run the project
-
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+Ejecutar la Aplicación
+# Modo desarrollo
+npm run start
 ```
 
-## Run tests
-
+## Tests
+El proyecto incluye tests unitarios para validar:
+reglas de negocio
+precedencia del motor
+integraciones externas mockeadas
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Ejecutar tests
+npm run test
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
