@@ -20,7 +20,7 @@ export class CostCenterCategoryRule implements Rule {
     return new RuleResult(ExpenseStatus.REJECTED, [
       new Alert(
         'POLITICA_CENTRO_COSTO',
-        `El C.C. '${employee.costCenter}' no puede reportar '${expense.category}'.`,
+        'Rendición prohibida',
       ),
     ]);
   }

@@ -18,7 +18,7 @@ export class CategoryLimitRule implements Rule {
       return new RuleResult(ExpenseStatus.REJECTED, [
         new Alert(
           'LIMITE_CATEGORIA',
-          `Excede el límite aprobado para ${expense.category}.`,
+          'Excede límite aprobado',
         ),
       ]);
     }
@@ -27,7 +27,7 @@ export class CategoryLimitRule implements Rule {
       return new RuleResult(ExpenseStatus.PENDING, [
         new Alert(
           'LIMITE_CATEGORIA',
-          `Monto requiere revisión para ${expense.category}.`,
+          'Requiere revisión',
         ),
       ]);
     }

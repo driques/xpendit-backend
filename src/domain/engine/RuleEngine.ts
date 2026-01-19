@@ -1,5 +1,4 @@
-import { Rule } from '../rules/Rule';
-import { RuleContext } from '../rules/RuleContext';
+import { Rule, RuleContext } from '../rules';
 import { ValidationResult } from '../models';
 import { StatusResolver } from './StatusResolver';
 
