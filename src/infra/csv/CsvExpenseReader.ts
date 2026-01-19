@@ -6,8 +6,15 @@ import { CsvRow } from '../../application/interfaces/ICsvRow';
 export class CsvExpenseReader {
   read(path: string): Expense[] {
     const file = fs.readFileSync(path);
+    return this.parseCsv(file);
+  }
 
-    const records: CsvRow[] = parse(file, {
+  readFromBuffer(buffer: Buffer): Expense[] {
+    return this.parseCsv(buffer);
+  }
+
+  private parseCsv(input: Buffer): Expense[] {
+    const records: CsvRow[] = parse(input, {
       columns: true,
       skip_empty_lines: true,
     });

@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ExpensesController } from './interfaces/http/ExpensesController';
+import { ExpensesService } from './application/ExpensesService';
 
 @Module({
   imports: [
@@ -7,5 +9,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
   ],
+  controllers: [ExpensesController],
+  providers: [ExpensesService],
 })
-export class AppModule {}
+export class AppModule { }
