@@ -62,35 +62,40 @@ El desarrollo se organizó en **ramas incrementales**, cada una correspondiente 
    - Respuesta estructurada lista para ser consumida por un frontend.
    - Cliente frontend de demostración disponible en:  
       https://github.com/driques/xpendit-front/tree/master
-     API Endpoints
-La aplicación expone una API REST para procesar gastos. La URL base es http://localhost:3000.
 
-1. Procesar Archivo por Defecto
-Procesa el archivo gastos_historicos.csv ubicado en la raíz del proyecto.
+## API Endpoints
 
-URL: /expenses/process
-Método: GET
-Respuesta Exitosa: 200 OK
-Ejemplo de Uso:
-bash
-curl http://localhost:3000/expenses/process
-2. Procesar Archivo Subido (Upload)
+La aplicación expone una API REST para procesar gastos. La URL base es `http://localhost:3000`.
+
+### 1. Procesar Archivo por Defecto
+Procesa el archivo `gastos_historicos.csv` ubicado en la raíz del proyecto.
+
+- **URL:** `/expenses/process`
+- **Método:** `GET`
+- **Respuesta Exitosa:** `200 OK`
+- **Ejemplo de Uso:**
+  ```bash
+  curl http://localhost:3000/expenses/process
+  ```
+
+### 2. Procesar Archivo Subido (Upload)
 Permite subir un archivo CSV personalizado para ser procesado por el motor de reglas.
 
-URL: /expenses/upload
-Método: POST
-Headers: Content-Type: multipart/form-data
-Body:
-file: Archivo CSV a procesar.
-Respuesta Exitosa: 201 Created
-Ejemplo de Uso:
-bash
-curl -X POST -F "file=@/ruta/a/tu/archivo.csv" http://localhost:3000/expenses/upload
-Estructura de la Respuesta
+- **URL:** `/expenses/upload`
+- **Método:** `POST`
+- **Headers:** `Content-Type: multipart/form-data`
+- **Body:**
+  - `file`: Archivo CSV a procesar.
+- **Respuesta Exitosa:** `201 Created`
+- **Ejemplo de Uso:**
+  ```bash
+  curl -X POST -F "file=@/ruta/a/tu/archivo.csv" http://localhost:3000/expenses/upload
+  ```
+
+### Estructura de la Respuesta
 Ambos endpoints devuelven un objeto JSON con el siguiente formato:
 
-```bash
-json
+```json
 {
   "stats": {
     "aprobados": 10,
@@ -112,7 +117,6 @@ json
   ]
 }
 ```
-
 ---
 
 ## Manejo del Tiempo y Testabilidad
