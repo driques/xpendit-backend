@@ -135,9 +135,9 @@ Este enfoque permite tests confiables y reproducibles.
 La aplicación requiere una API Key válida de **Open Exchange Rates** para la conversión de monedas.
 
 Crear un archivo `.env` en la raíz del proyecto:
-PORT=3000
-OPEN_EXCHANGE_APP_ID=THIS-IS-A-TOKEN
-OPEN_EXCHANGE_BASE_URL=THIS-IS-EXCHANGE-URL
+- PORT=3000
+- OPEN_EXCHANGE_APP_ID=THIS-IS-A-TOKEN
+- OPEN_EXCHANGE_BASE_URL=THIS-IS-EXCHANGE-URL
 
 ---
 
